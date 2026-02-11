@@ -1,0 +1,141 @@
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0f172a; /* Slate 900 */
+  color: #f1f5f9; /* Slate 100 */
+  line-height: 1.5;
+}
+
+/* Layout Containers */
+.app-container {
+  min-height: 100vh;
+}
+
+.header {
+  background-color: #ffffff; /* Slate 800 */
+  border-bottom: 1px solid #e4e4e4; /* Slate 700 */
+  padding: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 72rem; /* approx 1150px */
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #22d3ee, #60a5fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.main-content {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  gap: 2rem;
+}
+
+/* Grid Layout for Top Section */
+.top-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .top-section {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Video Player Styles */
+.video-player-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #ececec;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+}
+
+.video-placeholder svg {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Inputs & Forms */
+.search-form {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  background-color: #1e293b;
+  border: 2px solid #334155;
+  color: white;
+  padding: 1rem 1rem 1rem 3rem; /* Left padding for icon */
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #06b6d4; /* Cyan 500 */
+}
+
+.search-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0 1.5rem;
+  background-color: #0891b2; /* Cyan 600 */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.search-btn:hover {
+  background-color: #06b6d4;
+}

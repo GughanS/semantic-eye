@@ -1,0 +1,31 @@
+services:
+  # The Brain (FastAPI + AI)
+  backend:
+    build: ./backend
+    container_name: semantic_eye_backend
+    ports:
+      - "8002:8002"
+    volumes:
+      # Persist data even if container restarts
+      - ./backend/data:/app/data
+      # Cache AI models so we don't download them every time
+      - ./backend/model_cache:/app/model_cache
+      # Persist uploads and clips
+      - ./backend/videos:/app/videos
+      - ./backend/clips:/app/clips
+    environment:
+      # Tell the backend where to store the model
+      - MODEL_CACHE_DIR=/app/model_cache
+    restart: unless-stopped
+
+  # The Face (React)
+  frontend:
+    build: ./frontend
+    container_name: semantic_eye_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8002
+    restart: unless-stopped
