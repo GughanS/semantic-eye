@@ -1,100 +1,124 @@
-# **Semantic Eye: Video Search Architecture (Professional Edition)**
+<div align="center">
+  <h1>👁️ Semantic Eye</h1>
+  <p><strong>Intelligent Video Search Architecture</strong></p>
 
-Semantic Eye is a multimodal AI system that allows users to search within video footage using natural language queries (e.g., "Find the moment a car appears" or "A person walking").
+  <p>
+    <a href="https://github.com/GughanS/semantic-eye/actions"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/GughanS/semantic-eye/ci-cd.yml?style=for-the-badge&logo=github"></a>
+    <a href="https://github.com/GughanS/semantic-eye/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/GughanS/semantic-eye?style=for-the-badge"></a>
+    <a href="https://fastapi.tiangolo.com"><img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=FastAPI&logoColor=white"></a>
+    <a href="https://react.dev"><img alt="React" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"></a>
+    <a href="https://www.docker.com/"><img alt="Docker" src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white"></a>
+  </p>
+</div>
 
-This project has been heavily refactored to align with **Product-Based Engineering Standards**, moving away from black-box LLMs (like CLIP) in favor of traditional Machine Learning (YOLOv8) with robust MLOps, CI/CD, and Observability.
+---
 
-## **Key Features**
+## 📖 Overview
 
-**Verified Event Pipeline:** Combines Optical Flow (Motion Physics) with YOLOv8 (Object Detection) to eliminate false positives on static scenes.
+**Semantic Eye** is a multimodal AI system that allows users to search within video footage using natural language queries (e.g., _"Find the moment a car appears"_ or _"A person walking"_).
 
-**Search Engine:** Replaced LanceDB embeddings with relational keyword matching (PostgreSQL) against YOLO-extracted tags.
+Built with **Product-Based Engineering Standards**, this architecture moves away from unpredictable black-box LLMs (like CLIP) in favor of highly deterministic traditional Machine Learning (YOLOv8). It comes fully equipped with robust **MLOps, CI/CD pipelines, and Observability**.
 
-**MLOps Ready:** Includes MLflow integration for model metrics tracking, and Prometheus/Grafana for API observability.
+## ✨ Key Features
 
-**Containerized & Scalable:** Fully Dockerized architecture via Docker Compose and multi-stage builds. CI/CD pipeline included for GitHub Actions.
+- **🛡️ Verified Event Pipeline**: Combines **Dense Optical Flow** (Motion Physics) with **YOLOv8** (Object Detection) to virtually eliminate false positives in static scenes.
+- **🔍 High-Speed Search Engine**: Leverages relational keyword matching in **PostgreSQL** against YOLO-extracted tags instead of expensive vector embeddings.
+- **📊 MLOps & Observability Ready**: Fully integrated with **MLflow** for model metric tracking, and **Prometheus/Grafana** for deep API observability.
+- **🐳 Containerized & Scalable**: A complete multi-container Docker architecture via `docker-compose`. Includes multi-stage builds and automated **CI/CD via GitHub Actions**.
 
-## **Tech Stack**
+---
 
-**Frontend:**
-- Framework: React (Vite) served via Nginx
-- Styling: CSS Modules (Monolith Theme)
+## 🛠️ Tech Stack
 
-**Backend:**
-- API: FastAPI (Python)
-- ML Model: Ultralytics YOLOv8 (Object Detection, NO LLMs)
-- DB: PostgreSQL (SQLAlchemy)
-- Video Processing: OpenCV (cv2) + NumPy
-- Motion Logic: Dense Optical Flow (Farneback)
+### 🖥️ Frontend
+- **Framework**: React (Vite)
+- **Deployment**: Served via Nginx
+- **Styling**: CSS Modules (Monolith Theme)
 
-**Observability & MLOps:**
-- MLflow: Tracks YOLO inference parameters and metrics
-- Prometheus & Grafana: Tracks FastAPI endpoint health, latency, and throughput
+### ⚙️ Backend
+- **API**: FastAPI (Python)
+- **ML Model**: Ultralytics YOLOv8 (Object Detection)
+- **Database**: PostgreSQL (SQLAlchemy ORM)
+- **Video Processing**: OpenCV (`cv2`) & NumPy
+- **Motion Logic**: Dense Optical Flow (Farneback Algorithm)
 
--------------------
+### 📈 Observability & MLOps
+- **MLflow**: Tracks YOLO inference parameters, speeds, and confidence metrics.
+- **Prometheus & Grafana**: Monitors FastAPI endpoint health, latency, throughput, and system resources.
 
-## **Project Structure**
+---
 
-```
-/semantic-eye
+## 📂 Project Structure
+
+```text
+semantic-eye/
+├── .github/workflows/   # CI/CD Pipelines (GitHub Actions)
 ├── backend/
-│   ├── main.py            # FastAPI Entry Point (w/ Prometheus metrics)
-│   ├── processing.py      # Motion Gate & Video Slicing
-│   ├── search_engine.py   # YOLOv8 & PostgreSQL Logic
-│   ├── requirements.txt   # Python Dependencies
-│   └── Dockerfile         # Multi-stage Docker build
+│   ├── main.py          # FastAPI Entry Point (w/ Prometheus metrics)
+│   ├── processing.py    # Motion Gate & Video Slicing Logic
+│   ├── search_engine.py # YOLOv8 & PostgreSQL Integration
+│   ├── requirements.txt # Python Dependencies
+│   └── Dockerfile       # Multi-stage Backend Docker Build
 ├── frontend/
-│   ├── src/               # React UI Logic
-│   └── Dockerfile         # Nginx production build
-├── .github/workflows/
-│   └── ci-cd.yml          # GitHub Actions Pipeline
-├── docker-compose.yml     # Orchestration (App, DB, MLflow, Grafana, Prometheus)
-└── prometheus.yml         # Prometheus scrape config
+│   ├── src/             # React UI Components
+│   └── Dockerfile       # Nginx Production Build
+├── docker-compose.yml   # Orchestration (App, DB, MLflow, Grafana, Prometheus)
+└── prometheus.yml       # Prometheus Scrape Configuration
 ```
 
-## **Installation & Setup**
+---
 
-### **Running with Docker Compose (Recommended)**
+## 🚀 Installation & Setup
 
-The fastest way to spin up the entire cluster (Frontend, Backend, Database, and Observability tools).
+### Running with Docker Compose (Recommended)
 
-```bash
-docker-compose up --build
-```
+The fastest and most reliable way to spin up the entire cluster (Frontend, Backend, Database, and Observability stack).
 
-**Services will be available at:**
-- **Frontend Dashboard:** `http://localhost:5173`
-- **Backend API:** `http://localhost:8002`
-- **MLflow Tracking:** `http://localhost:5000`
-- **Grafana Dashboards:** `http://localhost:3000`
-- **Prometheus UI:** `http://localhost:9090`
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/GughanS/semantic-eye.git
+   cd semantic-eye
+   ```
 
-### **Usage Guide**
+2. Start the cluster:
+   ```bash
+   docker-compose up --build
+   ```
 
-**Upload:** Click "Import Footage" to select a video file (MP4/MKV).
+### 🌐 Service Endpoints
 
-**Process:** Click "Run Pipeline". 
+Once the cluster is running, services will be accessible at:
+- **Frontend UI**: [http://localhost:5173](http://localhost:5173)
+- **Backend API Docs**: [http://localhost:8002/docs](http://localhost:8002/docs)
+- **Grafana Dashboards**: [http://localhost:3000](http://localhost:3000)
+- **MLflow Tracking UI**: [http://localhost:5000](http://localhost:5000)
+- **Prometheus**: [http://localhost:9090](http://localhost:9090)
 
-The system will:
-1. Slice video into temporal units.
-2. Calculate Optical Flow energy.
-3. Generate Object Detection Tags (via YOLOv8) for valid events.
-4. Index metadata into PostgreSQL.
+---
 
-**Search:** Type a query like "Person" or "Car".
+## 🎯 Usage Guide
 
-## **Architecture Details**
+1. **Upload Footage**: Open the Frontend Dashboard and click **"Import Footage"** to select a video file (`.mp4`, `.mkv`).
+2. **Process**: Click **"Run Pipeline"**. The system automatically:
+   - Slices the video into temporal units.
+   - Calculates Optical Flow energy to isolate motion.
+   - Generates Object Detection Tags (via YOLOv8) for valid events.
+   - Indexes metadata into PostgreSQL.
+3. **Search**: Type a natural language query (e.g., _"Person"_, _"Car"_) in the search bar and instantly view the corresponding video segments.
 
-The "Verified Event" Protocol
+---
 
-**Temporal Slicing:** Video is divided into 16-frame overlap windows.
+## 🧠 Architecture Deep Dive: The "Verified Event" Protocol
 
-**Motion Gate:** Every window is checked for motion energy. Energy < 0.5 is discarded immediately.
+The core philosophy of Semantic Eye is verifiable, deterministic video understanding:
 
-**Semantic Tagging (YOLOv8):** Surviving windows are passed to YOLOv8. Detected object classes (e.g., "car", "person") are saved as tags to the database.
+1. **Temporal Slicing**: The video is divided into rolling 16-frame overlap windows to ensure smooth temporal continuity.
+2. **Motion Gate (Optical Flow)**: Every window is checked for motion energy. Windows with an energy score `< 0.5` are discarded immediately, saving massive computational overhead on static frames.
+3. **Semantic Tagging (YOLOv8)**: Surviving motion windows are passed to the YOLOv8 model. Detected object classes are saved directly as relational tags.
+4. **Search Scoring**: Queries perform textual matching against these deterministic tags combined with motion confidence scoring, resulting in highly verifiable results without the risk of LLM hallucinations.
 
-**Search Scoring:** Search relies on textual matching against tags, combined with motion confidence scoring, producing a highly verifiable, deterministic result without LLM hallucination.
+---
 
-## **License**
+## 📄 License
 
-MIT License. Built for educational and research purposes.
+This project is licensed under the **MIT License**. Built for advanced engineering and research purposes.
