@@ -17,14 +17,15 @@
 
 **Semantic Eye** is a multimodal AI system that allows users to search within video footage using natural language queries (e.g., _"Find the moment a car appears"_ or _"A person walking"_).
 
-Built with **Product-Based Engineering Standards**, this architecture moves away from unpredictable black-box LLMs (like CLIP) in favor of highly deterministic traditional Machine Learning (YOLOv8). It comes fully equipped with robust **MLOps, CI/CD pipelines, and Observability**.
+It combines the power of motion detection (Optical Flow) with the deep semantic understanding of **CLIP (ViT-L-14)** to provide highly accurate, verified video search. By filtering out static frames before they ever reach the AI model, the system drastically reduces computational overhead and avoids false positives.
 
 ## Key Features
 
-- **Verified Event Pipeline**: Combines **Dense Optical Flow** (Motion Physics) with **YOLOv8** (Object Detection) to virtually eliminate false positives in static scenes.
-- **High-Speed Search Engine**: Leverages relational keyword matching in **PostgreSQL** against YOLO-extracted tags instead of expensive vector embeddings.
-- **MLOps & Observability Ready**: Fully integrated with **MLflow** for model metric tracking, and **Prometheus/Grafana** for deep API observability.
-- **Containerized & Scalable**: A complete multi-container Docker architecture via `docker-compose`. Includes multi-stage builds and automated **CI/CD via GitHub Actions**.
+- **Semantic Search Engine**: Utilizes **OpenAI's CLIP model (clip-ViT-L-14)** via `sentence-transformers` for zero-shot image-to-text semantic matching.
+- **High-Speed Vector Database**: Uses **LanceDB** to store and query high-dimensional embeddings (768-dim) efficiently.
+- **Motion Gating Protocol**: Calculates Dense Optical Flow to filter out static scenes, ensuring the AI only processes frames where actual events occur.
+- **Advanced Filtering**: Implements dynamic percentile scoring and negative-query anchoring to dramatically reduce false positives.
+- **Containerized & Scalable**: A complete multi-container Docker architecture via `docker-compose`. Includes multi-stage builds and automated CI/CD via GitHub Actions.
 
 ---
 
@@ -33,17 +34,17 @@ Built with **Product-Based Engineering Standards**, this architecture moves away
 ### Frontend
 - **Framework**: React (Vite)
 - **Deployment**: Served via Nginx
-- **Styling**: CSS Modules (Monolith Theme)
+- **Styling**: CSS Modules
 
 ### Backend
 - **API**: FastAPI (Python)
-- **ML Model**: Ultralytics YOLOv8 (Object Detection)
-- **Database**: PostgreSQL (SQLAlchemy ORM)
-- **Video Processing**: OpenCV (`cv2`) & NumPy
+- **AI Model**: CLIP (ViT-L-14) via `sentence-transformers`
+- **Vector DB**: LanceDB
+- **Video Processing**: OpenCV (`cv2`), NumPy, Pillow
 - **Motion Logic**: Dense Optical Flow (Farneback Algorithm)
 
 ### Observability & MLOps
-- **MLflow**: Tracks YOLO inference parameters, speeds, and confidence metrics.
+- **MLflow**: Tracks inference metrics and logs.
 - **Prometheus & Grafana**: Monitors FastAPI endpoint health, latency, throughput, and system resources.
 
 ---
@@ -56,7 +57,7 @@ semantic-eye/
 ├── backend/
 │   ├── main.py          # FastAPI Entry Point (w/ Prometheus metrics)
 │   ├── processing.py    # Motion Gate & Video Slicing Logic
-│   ├── search_engine.py # YOLOv8 & PostgreSQL Integration
+│   ├── search_engine.py # CLIP & LanceDB Integration
 │   ├── requirements.txt # Python Dependencies
 │   └── Dockerfile       # Multi-stage Backend Docker Build
 ├── frontend/
@@ -72,7 +73,7 @@ semantic-eye/
 
 ### Running with Docker Compose (Recommended)
 
-The fastest and most reliable way to spin up the entire cluster (Frontend, Backend, Database, and Observability stack).
+The fastest and most reliable way to spin up the entire cluster.
 
 1. Clone the repository:
    ```bash
@@ -102,20 +103,23 @@ Once the cluster is running, services will be accessible at:
 2. **Process**: Click **"Run Pipeline"**. The system automatically:
    - Slices the video into temporal units.
    - Calculates Optical Flow energy to isolate motion.
-   - Generates Object Detection Tags (via YOLOv8) for valid events.
-   - Indexes metadata into PostgreSQL.
-3. **Search**: Type a natural language query (e.g., _"Person"_, _"Car"_) in the search bar and instantly view the corresponding video segments.
+   - Encodes surviving frames into 768-dimensional vectors using CLIP.
+   - Indexes embeddings and metadata into LanceDB.
+3. **Search**: Type a natural language query (e.g., _"Person"_, _"Car"_) in the search bar. The engine encodes your text with CLIP and performs a cosine similarity search against the video frames.
 
 ---
 
 ## Architecture Deep Dive: The "Verified Event" Protocol
 
-The core philosophy of Semantic Eye is verifiable, deterministic video understanding:
+The core philosophy of Semantic Eye is robust, verifiable video understanding:
 
-1. **Temporal Slicing**: The video is divided into rolling 16-frame overlap windows to ensure smooth temporal continuity.
-2. **Motion Gate (Optical Flow)**: Every window is checked for motion energy. Windows with an energy score `< 0.5` are discarded immediately, saving massive computational overhead on static frames.
-3. **Semantic Tagging (YOLOv8)**: Surviving motion windows are passed to the YOLOv8 model. Detected object classes are saved directly as relational tags.
-4. **Search Scoring**: Queries perform textual matching against these deterministic tags combined with motion confidence scoring, resulting in highly verifiable results without the risk of LLM hallucinations.
+1. **Temporal Slicing**: The video is divided into rolling overlap windows to ensure smooth temporal continuity.
+2. **Motion Gate (Optical Flow)**: Every window is checked for motion energy. Windows lacking motion are discarded immediately, saving massive computational overhead.
+3. **Semantic Encoding (CLIP)**: Surviving motion windows are passed to CLIP, generating rich semantic vectors.
+4. **Three-Gate Search Engine**:
+   - **Gate 1**: Hard-rejects anything below an absolute similarity floor.
+   - **Gate 2**: A dynamic percentile floor trims the weakest matches among genuine candidates.
+   - **Gate 3**: A negative-query anchor rejects false positives that share incidental visual features but lack the subject (e.g., an empty road vs. a car crash).
 
 ---
 
