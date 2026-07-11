@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>👁️ Semantic Eye</h1>
+  <h1>Semantic Eye</h1>
   <p><strong>Intelligent Video Search Architecture</strong></p>
 
   <p>
@@ -13,42 +13,42 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 **Semantic Eye** is a multimodal AI system that allows users to search within video footage using natural language queries (e.g., _"Find the moment a car appears"_ or _"A person walking"_).
 
 Built with **Product-Based Engineering Standards**, this architecture moves away from unpredictable black-box LLMs (like CLIP) in favor of highly deterministic traditional Machine Learning (YOLOv8). It comes fully equipped with robust **MLOps, CI/CD pipelines, and Observability**.
 
-## ✨ Key Features
+## Key Features
 
-- **🛡️ Verified Event Pipeline**: Combines **Dense Optical Flow** (Motion Physics) with **YOLOv8** (Object Detection) to virtually eliminate false positives in static scenes.
-- **🔍 High-Speed Search Engine**: Leverages relational keyword matching in **PostgreSQL** against YOLO-extracted tags instead of expensive vector embeddings.
-- **📊 MLOps & Observability Ready**: Fully integrated with **MLflow** for model metric tracking, and **Prometheus/Grafana** for deep API observability.
-- **🐳 Containerized & Scalable**: A complete multi-container Docker architecture via `docker-compose`. Includes multi-stage builds and automated **CI/CD via GitHub Actions**.
+- **Verified Event Pipeline**: Combines **Dense Optical Flow** (Motion Physics) with **YOLOv8** (Object Detection) to virtually eliminate false positives in static scenes.
+- **High-Speed Search Engine**: Leverages relational keyword matching in **PostgreSQL** against YOLO-extracted tags instead of expensive vector embeddings.
+- **MLOps & Observability Ready**: Fully integrated with **MLflow** for model metric tracking, and **Prometheus/Grafana** for deep API observability.
+- **Containerized & Scalable**: A complete multi-container Docker architecture via `docker-compose`. Includes multi-stage builds and automated **CI/CD via GitHub Actions**.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-### 🖥️ Frontend
+### Frontend
 - **Framework**: React (Vite)
 - **Deployment**: Served via Nginx
 - **Styling**: CSS Modules (Monolith Theme)
 
-### ⚙️ Backend
+### Backend
 - **API**: FastAPI (Python)
 - **ML Model**: Ultralytics YOLOv8 (Object Detection)
 - **Database**: PostgreSQL (SQLAlchemy ORM)
 - **Video Processing**: OpenCV (`cv2`) & NumPy
 - **Motion Logic**: Dense Optical Flow (Farneback Algorithm)
 
-### 📈 Observability & MLOps
+### Observability & MLOps
 - **MLflow**: Tracks YOLO inference parameters, speeds, and confidence metrics.
 - **Prometheus & Grafana**: Monitors FastAPI endpoint health, latency, throughput, and system resources.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 semantic-eye/
@@ -68,7 +68,7 @@ semantic-eye/
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### Running with Docker Compose (Recommended)
 
@@ -85,7 +85,7 @@ The fastest and most reliable way to spin up the entire cluster (Frontend, Backe
    docker-compose up --build
    ```
 
-### 🌐 Service Endpoints
+### Service Endpoints
 
 Once the cluster is running, services will be accessible at:
 - **Frontend UI**: [http://localhost:5173](http://localhost:5173)
@@ -96,7 +96,7 @@ Once the cluster is running, services will be accessible at:
 
 ---
 
-## 🎯 Usage Guide
+## Usage Guide
 
 1. **Upload Footage**: Open the Frontend Dashboard and click **"Import Footage"** to select a video file (`.mp4`, `.mkv`).
 2. **Process**: Click **"Run Pipeline"**. The system automatically:
@@ -108,7 +108,7 @@ Once the cluster is running, services will be accessible at:
 
 ---
 
-## 🧠 Architecture Deep Dive: The "Verified Event" Protocol
+## Architecture Deep Dive: The "Verified Event" Protocol
 
 The core philosophy of Semantic Eye is verifiable, deterministic video understanding:
 
@@ -119,6 +119,6 @@ The core philosophy of Semantic Eye is verifiable, deterministic video understan
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**. Built for advanced engineering and research purposes.
