@@ -1,31 +1,62 @@
+version: '3.8'
+
 services:
-  # The Brain (FastAPI + AI)
+  # The Brain (FastAPI + YOLOv8)
   backend:
     build: ./backend
     container_name: semantic_eye_backend
     ports:
-      - "8002:8002"
+      - "8005:8002"
     volumes:
-      # Persist data even if container restarts
       - ./backend/data:/app/data
-      # Cache AI models so we don't download them every time
       - ./backend/model_cache:/app/model_cache
-      # Persist uploads and clips
       - ./backend/videos:/app/videos
       - ./backend/clips:/app/clips
     environment:
-      # Tell the backend where to store the model
       - MODEL_CACHE_DIR=/app/model_cache
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
     restart: unless-stopped
 
-  # The Face (React)
+  # The Face (React on Nginx)
   frontend:
     build: ./frontend
     container_name: semantic_eye_frontend
     ports:
-      - "5173:5173"
+      - "5173:80"
     depends_on:
       - backend
-    environment:
-      - VITE_API_URL=http://localhost:8002
+    restart: unless-stopped
+
+
+
+  # MLOps - Model Tracking
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.2
+    container_name: semantic_eye_mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0
+    restart: unless-stopped
+
+  # Observability - Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: semantic_eye_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  # Observability - Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: semantic_eye_grafana
+    user: root
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
     restart: unless-stopped

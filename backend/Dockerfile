@@ -1,5 +1,5 @@
 # Use a lightweight Python base
-FROM python:3.10-slim
+FROM python:3.10-slim-bookworm
 
 # Set working directory inside container
 WORKDIR /app
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .

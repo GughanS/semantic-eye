@@ -1,17 +1,13 @@
-# Use Node.js base
-FROM node:18-alpine
-
+# Build Stage
+FROM node:18-alpine AS build
 WORKDIR /app
-
-# Install dependencies
 COPY package.json package-lock.json* ./
-RUN npm install
-
-# Copy source code
+RUN npm ci
 COPY . .
+RUN npm run build
 
-# Expose Vite port
-EXPOSE 5173
-
-# Run dev server with host flag to allow access from outside container
-CMD ["npm", "run", "dev", "--", "--host"]
+# Serving Stage
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

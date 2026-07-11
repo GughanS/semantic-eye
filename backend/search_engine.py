@@ -13,21 +13,21 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+# ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 # Constants
-# ──────────────────────────────────────────────────────────────────────────────
+# ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
-VECTOR_DIM      = 512
+VECTOR_DIM      = 768
 DEFAULT_DB_PATH = "data/lancedb"
 TABLE_NAME      = "gods_eye_events"
-MODEL_ID        = "clip-ViT-B-32"
+MODEL_ID        = "clip-ViT-L-14"
 
 # Semantic must dominate; motion is a tiebreaker only.
 W_SEMANTIC       = 0.85
 W_MOTION         = 0.15
 FLOOR_PERCENTILE = 15
 
-# ── CLIP Prompt Ensembling ────────────────────────────────────────────────────
+# ΓöÇΓöÇ CLIP Prompt Ensembling ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 QUERY_TEMPLATES = [
     "a photo of {}",
     "a video frame showing {}",
@@ -36,29 +36,29 @@ QUERY_TEMPLATES = [
     "a scene depicting {}",
 ]
 
-# ── Absolute Similarity Floor ─────────────────────────────────────────────────
+# ΓöÇΓöÇ Absolute Similarity Floor ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 # Empirical ViT-B/32 cosine similarity ranges:
-#   Unrelated content (e.g. "car crash" vs pedestrian street): ~0.21–0.24
-#   Loosely related:                                            ~0.24–0.27
+#   Unrelated content (e.g. "car crash" vs pedestrian street): ~0.21ΓÇô0.24
+#   Loosely related:                                            ~0.24ΓÇô0.27
 #   Genuinely matching:                                         ~0.27+
 # The absolute floor is Gate 1: hard-reject anything in the noise band.
 # The dynamic floor is Gate 2: among survivors, reject the weakest percentile.
-# Gate 2 is computed on Gate 1 survivors only — so it trims the bottom of
+# Gate 2 is computed on Gate 1 survivors only ΓÇö so it trims the bottom of
 # *genuine* candidates rather than wasting percentile mass on noise.
-ABSOLUTE_SEM_FLOOR = 0.27
+ABSOLUTE_SEM_FLOOR = 0.28
 
-# ── Motion Normalisation ──────────────────────────────────────────────────────
+# ΓöÇΓöÇ Motion Normalisation ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 # event_probability is raw motion magnitude, not a bounded probability.
 # Clamp then re-scale to [0,1] before weighting.
 MOTION_CLAMP_MAX = 3.0
 
-# ── Negative-Query Anchor ─────────────────────────────────────────────────────
+# ΓöÇΓöÇ Negative-Query Anchor ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 NEGATIVE_ANCHOR_TEMPLATE = "a photo of a completely unrelated scene with no {}"
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+# ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 # SearchEngine
-# ──────────────────────────────────────────────────────────────────────────────
+# ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 class SearchEngine:
     def __init__(
@@ -84,15 +84,15 @@ class SearchEngine:
             self.cache_dir = cache_dir
 
         os.makedirs(self.cache_dir, exist_ok=True)
-        logger.info(f"Loading CLIP model ({MODEL_ID}) into {self.cache_dir} …")
+        logger.info(f"Loading CLIP model ({MODEL_ID}) into {self.cache_dir} ΓÇª")
         self.model = SentenceTransformer(MODEL_ID, cache_folder=self.cache_dir)
 
         self.db = lancedb.connect(db_path)
         self._init_table()
 
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     # Table setup
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     def _init_table(self) -> None:
         schema = pa.schema([
@@ -107,12 +107,12 @@ class SearchEngine:
             self.table = self.db.open_table(TABLE_NAME)
             logger.info("Opened existing LanceDB table.")
         except Exception:
-            logger.info("No existing table – creating a new one.")
+            logger.info("No existing table ΓÇô creating a new one.")
             self.table = self.db.create_table(TABLE_NAME, schema=schema, mode="overwrite")
 
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     # Encoding helpers
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     def _encode_text_ensembled(self, text: str) -> np.ndarray:
         prompts  = [t.format(text) for t in QUERY_TEMPLATES]
@@ -124,20 +124,20 @@ class SearchEngine:
         prompt = NEGATIVE_ANCHOR_TEMPLATE.format(text)
         return self.model.encode(prompt, normalize_embeddings=True)
 
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     # Indexing
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     def index_verified_events(self, events_metadata: list[dict]) -> None:
         valid_events = [e for e in events_metadata if Path(e["frame_path"]).exists()]
         skipped = len(events_metadata) - len(valid_events)
         if skipped:
-            logger.warning(f"Skipped {skipped} event(s) – frame path not found.")
+            logger.warning(f"Skipped {skipped} event(s) ΓÇô frame path not found.")
         if not valid_events:
             logger.warning("No valid events to index.")
             return
 
-        logger.info(f"Encoding {len(valid_events)} frames …")
+        logger.info(f"Encoding {len(valid_events)} frames ΓÇª")
         images  = [Image.open(e["frame_path"]).convert("RGB") for e in valid_events]
         vectors = self.model.encode(
             images,
@@ -160,12 +160,12 @@ class SearchEngine:
         self.table.add(rows)
         logger.info(f"Indexed {len(rows)} events.")
 
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     # Scoring helpers
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     def _cosine_from_distance(self, distance: float) -> float:
-        """LanceDB cosine metric stores (1 − cosine_sim) as _distance."""
+        """LanceDB cosine metric stores (1 ΓêÆ cosine_sim) as _distance."""
         return 1.0 - max(0.0, min(2.0, float(distance)))
 
     def _fused_score(self, sem: float, motion_raw: float) -> float:
@@ -177,7 +177,7 @@ class SearchEngine:
         """
         Percentile floor computed on the provided scores.
         Always called on Gate-1 survivors (absolute-floor passes) so the
-        percentile is meaningful — it cuts the weakest genuine candidates,
+        percentile is meaningful ΓÇö it cuts the weakest genuine candidates,
         not noise that Gate 1 already handles.
         """
         if not sem_scores:
@@ -193,9 +193,9 @@ class SearchEngine:
     ) -> bool:
         return float(np.dot(frame_vec, neg_vec)) > float(np.dot(frame_vec, pos_vec)) + margin
 
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     # Search
-    # ──────────────────────────────────────────────────────────────────────────
+    # ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     def search(
         self,
@@ -206,17 +206,17 @@ class SearchEngine:
         """
         Three-gate filtering pipeline:
 
-          Gate 1 – Absolute floor  (ABSOLUTE_SEM_FLOOR = 0.27)
-            Hard-rejects anything in the noise band (~0.21–0.26).
+          Gate 1 ΓÇô Absolute floor  (ABSOLUTE_SEM_FLOOR = 0.27)
+            Hard-rejects anything in the noise band (~0.21ΓÇô0.26).
             Fast: no vector arithmetic needed.
 
-          Gate 2 – Dynamic percentile floor  (p15 of Gate-1 survivors)
+          Gate 2 ΓÇô Dynamic percentile floor  (p15 of Gate-1 survivors)
             Computed exclusively on candidates that passed Gate 1, so the
             percentile reflects the distribution of *genuine* candidates,
-            not noise.  Trims the weakest 15% of real matches — useful when
+            not noise.  Trims the weakest 15% of real matches ΓÇö useful when
             many frames are genuinely relevant and we want only the strongest.
 
-          Gate 3 – Negative-query rejection
+          Gate 3 ΓÇô Negative-query rejection
             Re-scores each survivor against a negative anchor.  Catches
             edge-case false positives that share incidental visual features
             with the query (e.g. an open road resembling a crash scene).
@@ -224,11 +224,11 @@ class SearchEngine:
         fetch_k = fetch_k or max(limit * 3, 20)
         logger.info(f'Searching: "{text_query}"')
 
-        # Encode ───────────────────────────────────────────────────────────────
+        # Encode ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         pos_vec = self._encode_text_ensembled(text_query)
         neg_vec = self._encode_negative(text_query)
 
-        # Retrieve ─────────────────────────────────────────────────────────────
+        # Retrieve ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         try:
             df = (
                 self.table
@@ -245,13 +245,13 @@ class SearchEngine:
             logger.warning("DB returned no candidates.")
             return []
 
-        # Pre-compute all semantic scores ──────────────────────────────────────
+        # Pre-compute all semantic scores ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         all_sem = [
             self._cosine_from_distance(row.get("_distance", 1.0))
             for _, row in df.iterrows()
         ]
 
-        # Gate 1: absolute floor ───────────────────────────────────────────────
+        # Gate 1: absolute floor ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         gate1_survivors = [
             (i, row) for (i, (_, row)) in enumerate(df.iterrows())
             if all_sem[i] >= self.absolute_sem_floor
@@ -262,12 +262,12 @@ class SearchEngine:
 
         if not gate1_survivors:
             logger.info(
-                f'  ⛔ Abstained: all candidates below absolute floor. '
+                f'  Γ¢ö Abstained: all candidates below absolute floor. '
                 f'"{text_query}" does not appear to be present in this video.'
             )
             return []
 
-        # Gate 2: dynamic percentile floor (on Gate-1 survivors only) ──────────
+        # Gate 2: dynamic percentile floor (on Gate-1 survivors only) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         survivor_sem    = [all_sem[i] for i, _ in gate1_survivors]
         dynamic_floor   = self._dynamic_floor(survivor_sem)
         gate2_survivors = [
@@ -278,7 +278,7 @@ class SearchEngine:
         if n_rejected_g2:
             logger.debug(f"  Gate 2 rejected {n_rejected_g2} candidate(s) below dynamic floor ({dynamic_floor:.4f})")
 
-        # Gate 3: negative-query rejection + fused scoring ─────────────────────
+        # Gate 3: negative-query rejection + fused scoring ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
         results = []
         for i, row in gate2_survivors:
             sem  = all_sem[i]
@@ -288,7 +288,7 @@ class SearchEngine:
             frame_vec = np.array(row["vector"], dtype=np.float32)
             frame_vec = frame_vec / (np.linalg.norm(frame_vec) + 1e-9)
             if self._is_false_positive(frame_vec, pos_vec, neg_vec):
-                logger.debug(f"  Gate 3 rejected {t}  sem={sem:.4f} – closer to negative anchor")
+                logger.debug(f"  Gate 3 rejected {t}  sem={sem:.4f} ΓÇô closer to negative anchor")
                 continue
 
             fused = self._fused_score(sem, phys)
@@ -308,7 +308,7 @@ class SearchEngine:
 
         if not results:
             logger.info(
-                f'  ⛔ Abstained: no indexed frames genuinely match '
+                f'  Γ¢ö Abstained: no indexed frames genuinely match '
                 f'"{text_query}". Content may not exist in this video.'
             )
         return results

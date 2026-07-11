@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import os
 import shutil
+import logging
+
+logger = logging.getLogger(__name__)
 
 class VideoPipeline:
     def __init__(self, upload_dir="data/videos", clips_dir="data/clips"):
@@ -35,20 +38,25 @@ class VideoPipeline:
 
         valid_events = []
         
-        # Buffer to hold frames for the current window
+        # Buffer to hold small frames for optical flow and CLIP
         frames_buffer = []
         
         frame_idx = 0
+        logger.info(f"Starting frame extraction loop for {video_id} - Total Frames: {total_frames}")
+        
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
+                
+            if frame_idx > 0 and frame_idx % 100 == 0:
+                logger.info(f"Processed {frame_idx}/{total_frames} frames for {video_id}")
             
-            # Resize for performance (Optical flow is expensive)
-            # We keep aspect ratio but limit height to 360p for flow calc
+            # Resize for performance and memory
+            # Downscale to 360p to balance flow speed and visual quality for CLIP
             h, w = frame.shape[:2]
             scale = 360 / h
-            small_frame = cv2.resize(frame, (int(w * scale), 360))
+            small_frame = cv2.resize(frame, (int(w * scale), 360), interpolation=cv2.INTER_NEAREST)
             
             frames_buffer.append(small_frame)
             
@@ -72,8 +80,7 @@ class VideoPipeline:
                     # because the Motion Encoder verified it.
                     timestamp = (frame_idx - (CLIP_LENGTH // 2)) / fps
                     
-                    # We save the full-res keyframe (we'd need to keep full res ref if we wanted high qual)
-                    # For this demo, we save the small frame to save disk space/speed
+                    # Save the small frame to save disk space and drastically improve speed
                     key_frame_path = os.path.join(video_output_dir, f"{frame_idx}.jpg")
                     cv2.imwrite(key_frame_path, frames_buffer[CLIP_LENGTH // 2])
                     
@@ -88,6 +95,12 @@ class VideoPipeline:
             frame_idx += 1
             
         cap.release()
+        
+        # Subsample to a maximum of 15 frames to avoid UI timeouts during heavy processing
+        if len(valid_events) > 15:
+            step = len(valid_events) / 15.0
+            valid_events = [valid_events[int(i * step)] for i in range(15)]
+            
         return valid_events
 
     def _compute_optical_flow_energy(self, frames):
