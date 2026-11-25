@@ -107,6 +107,37 @@ Once the cluster is running, services will be accessible at:
    - Indexes embeddings and metadata into LanceDB.
 3. **Search**: Type a natural language query (e.g., _"Person"_, _"Car"_) in the search bar. The engine encodes your text with CLIP and performs a cosine similarity search against the video frames.
 
+### Duplicate Uploads and Recovery
+
+Uploads are identified by the SHA-256 hash of their complete file contents, not by their filename. A repeated upload is reused only after processing, video storage, and (when events exist) indexing have all completed. The registry is stored in `data/video_ingestions.sqlite3` by default; set `SEMANTIC_EYE_REGISTRY_PATH` to use a different SQLite file.
+
+A readable video with no motion events is a completed ingestion with the existing `abstained_no_motion` response. Processing or indexing failures are not marked complete. Their hash is retained as failed, and later uploads of the same content return HTTP 409 instead of retrying automatically, because the index may contain partial rows. Recovery requires operator review of that record and any partial files or index rows.
+
+An abrupt process exit can leave a record in `processing`; later identical uploads receive HTTP 409 because reservations do not expire. Failed and interrupted records are never automatically reset, retried, or deleted. Automatic recovery is not implemented.
+
+To inspect non-completed records without opening the database for writes, use Python's standard-library SQLite support in read-only mode (replace the URI with the configured path if needed):
+
+```python
+import sqlite3
+
+connection = sqlite3.connect("file:data/video_ingestions.sqlite3?mode=ro", uri=True)
+try:
+    rows = connection.execute(
+        "SELECT content_sha256, video_id, video_path, state, error "
+        "FROM ingestions WHERE state != 'completed' ORDER BY rowid"
+    )
+    for row in rows:
+        print(row)
+finally:
+    connection.close()
+```
+
+Before any manual recovery, inspect the stored video at `video_path`, the extracted frames under `data/clips/<video_id>`, and matching rows for that `video_id` in the `gods_eye_events` LanceDB table. Do not delete files or rows or retry the content until their consistency and any partial indexing have been reviewed.
+
+Existing video files and index rows are not migrated or removed. Files without registry entries remain accessible, but their contents cannot be deduplicated against new uploads until they are explicitly processed. This behavior protects sequential repeated uploads; concurrent-upload handling is not guaranteed and remains follow-up work.
+
+The pipeline treats an opened video with positive FPS and at least one decoded frame as processable, even if it yields no motion events. OpenCV's ordinary end-of-stream signal can also occur after a partial decode, so this check does not detect every possible mid-stream decoding failure.
+
 ---
 
 ## Architecture Deep Dive: The "Verified Event" Protocol
