@@ -3,6 +3,7 @@ import numpy as np
 import os
 import shutil
 import logging
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +24,25 @@ class VideoPipeline:
         4. Gate: Return metadata only for valid events
         """
         cap = cv2.VideoCapture(video_path)
+        try:
+            return self._process_capture(cap, video_path, video_id)
+        finally:
+            cap.release()
+
+    def _process_capture(self, cap, video_path, video_id):
+        if not cap.isOpened():
+            raise ValueError(f"Unable to open video: {video_path}")
+
         fps = cap.get(cv2.CAP_PROP_FPS)
+        if not math.isfinite(fps) or fps <= 0:
+            raise ValueError(f"Video has an invalid frame rate: {video_path}")
+
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        
+
         # Pipeline Parameters (As defined in Design Doc)
         CLIP_LENGTH = 16  # frames
         STRIDE = 8        # frames (50% overlap)
-        
+
         # Create folder for this video's evidence
         video_output_dir = os.path.join(self.clips_dir, video_id)
         if os.path.exists(video_output_dir):
@@ -94,7 +107,8 @@ class VideoPipeline:
             
             frame_idx += 1
             
-        cap.release()
+        if frame_idx == 0:
+            raise ValueError(f"Video contains no decodable frames: {video_path}")
         
         # Subsample to a maximum of 15 frames to avoid UI timeouts during heavy processing
         if len(valid_events) > 15:

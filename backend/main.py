@@ -3,12 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import PlainTextResponse
 from fastapi.concurrency import run_in_threadpool
-import shutil
-import uuid
 import os
 import time
 from processing import VideoPipeline
 from search_engine import SearchEngine
+from ingestion import IngestionConflict, IngestionRegistry, VideoIngestionService
 
 # Observability
 from prometheus_client import Counter, Histogram, generate_latest
@@ -36,6 +35,15 @@ EVENTS_VERIFIED = Counter("events_verified_total", "Total Verified Events")
 # Initialize the new Architecture
 pipeline = VideoPipeline() # Handles Optical Flow & Temporal Units
 engine = SearchEngine()    # Handles YOLO Tagging & DB Search
+ingestion_service = VideoIngestionService(
+    registry=IngestionRegistry(
+        os.getenv("SEMANTIC_EYE_REGISTRY_PATH", "data/video_ingestions.sqlite3")
+    ),
+    process_video=pipeline.process_video,
+    index_events=engine.index_verified_events,
+    video_dir="data/videos",
+    temp_dir=os.getenv("SEMANTIC_EYE_UPLOAD_TEMP_DIR", "/tmp"),
+)
 
 app.mount("/videos", StaticFiles(directory="data/videos"), name="videos")
 app.mount("/clips", StaticFiles(directory="data/clips"), name="clips")
@@ -47,44 +55,23 @@ def metrics():
 @app.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     start_time = time.time()
-    video_id = str(uuid.uuid4())[:8]
-    # Save to /tmp inside the container to avoid Docker for Windows bind mount IO deadlocks
-    file_location = f"/tmp/{video_id}_{file.filename}"
-    
-    with open(file_location, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
     try:
-        logger.info(f"Pipeline Started: {video_id} - file saved to {file_location}")
-        
-        # 1. Run Pipeline (Extract & Motion Gate) in a background thread to prevent blocking Uvicorn
-        verified_events = await run_in_threadpool(pipeline.process_video, file_location, video_id)
-        
-        # Move video from /tmp to static directory so frontend can play it
-        final_video_path = f"data/videos/{video_id}_{file.filename}"
-        os.makedirs("data/videos", exist_ok=True)
-        shutil.move(file_location, final_video_path)
-        
-        # 2. Index only if we have events
-        if verified_events:
-            await run_in_threadpool(engine.index_verified_events, verified_events)
-            status = "success"
-            EVENTS_VERIFIED.inc(len(verified_events))
-        else:
-            status = "abstained_no_motion"
+        outcome = await run_in_threadpool(
+            ingestion_service.ingest, file.file, file.filename or "video"
+        )
+        verified_count = outcome.verified_events_metric_increment
+        if verified_count:
+            EVENTS_VERIFIED.inc(verified_count)
         
         REQUEST_COUNT.labels(method="POST", endpoint="/upload", http_status=200).inc()
         REQUEST_LATENCY.labels(endpoint="/upload").observe(time.time() - start_time)
-        
-        return {
-            "status": status, 
-            "video_id": video_id, 
-            "video_url": f"/videos/{video_id}_{file.filename}",
-            "events_verified": len(verified_events)
-        }
+        return outcome.response
+    except IngestionConflict as e:
+        REQUEST_COUNT.labels(method="POST", endpoint="/upload", http_status=409).inc()
+        raise HTTPException(status_code=409, detail=str(e))
     except Exception as e:
         REQUEST_COUNT.labels(method="POST", endpoint="/upload", http_status=500).inc()
-        print(f"Error: {e}")
+        logger.exception("Upload failed")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/search")
